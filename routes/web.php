@@ -9,7 +9,7 @@ Route::get('/responder', [QuestionController::class, 'studentForm']);
 Route::post('/responder', [QuestionController::class, 'submitStudentForm']);
 Route::delete('/submissions/{id}', [QuestionController::class, 'destroySubmission']);
 
-// Rota temporária para rodar migrações e seeders no Render (Free Tier)
+// Rota temporária estéril para rodar migrações e seeders no Render (bypassa a checagem de sessão)
 Route::get('/migrar-banco-sabe', function () {
     try {
         // Executa as migrações de tabelas
@@ -22,4 +22,10 @@ Route::get('/migrar-banco-sabe', function () {
     } catch (\Exception $e) {
         return '<h2>Erro ao migrar banco de dados:</h2><pre>' . $e->getMessage() . '</pre>';
     }
-});
+})->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Cookie\Middleware\EncryptCookies.class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class
+]);
